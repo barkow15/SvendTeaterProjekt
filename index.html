@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Site</title>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <style>
+        body { padding-top:50px; }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+       const socketio = io();
+
+       socketio.emit('vote', 'hello');
+
+       // socketio.on('vote-response', function(msg) {
+       //    console.log(msg);
+       // });
+
+       socketio.on('number-of-users-connected', function(res) {
+          console.log(res);
+       });
+       
+       socketio.on('showpanel', function (res) {
+          console.log(res);
+       });
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron">
+        <h1>res.sendFile() Works!</h1>
+    </div>
+</div>
+
+</body>
+</html>
