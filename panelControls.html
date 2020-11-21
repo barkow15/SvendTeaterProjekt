@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Sample Site</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <style>
         body { padding-top:50px; background-color: #151515;}
@@ -75,41 +76,43 @@
 
        socketio.on('number-of-users-connected', function(res) {
           console.log(res);
-
-          document.getElementById("usersconnected").innerText = res;
+          // document.getElementById("usersconnected").innerText = res;
        });
        
-       socketio.on('showpanel', function (res) {
-          const panelElem = document.querySelector('.boks');
-          if(res){
-             panelElem.style.display = "block";
+       const togglePanel = (panelState) => {
+          // panelToggleButton.innerHTML = "Skjul panel";
+          if(panelState){
+             axios.post('/panel', {
+                "showPanel": true
+             })
+             .then(function (response) {
+                console.log(response);
+             })
+             .catch(function (error) {
+                console.log(error);
+             });
           }else{
-             panelElem.style.display = "none";
+             axios.post('/panel', {
+                "showPanel": false
+             })
+             .then(function (response) {
+                console.log(response);
+             })
+             .catch(function (error) {
+                console.log(error);
+             });
           }
-       });
+       };
     </script>
 </head>
 <body>
 
 <div class="container">
     <div class="jumbotron">
-        <h1>Brugere forbundet <span id="usersconnected"></span></h1>
-    </div>
-
-    <div class="boks" style="display:none;">
-        <div class="spoergsmal">Hvem skal dø?</div>
-        <form method='POST' action=''>
-            <radio>
-                <div class="undergang"><label for="other">Brynhild</label><br /><input type="radio" name="person_id" class="knap" value="1"></div>
-                <div class="undergang"><label for="other">Anders</label><br /><input type="radio" name="person_id" class="knap" value="1"></div>
-                <div class="undergang"><label for="other">Flemming</label><br /><input type="radio" name="person_id" class="knap"  value="1"></div>
-                <div class="undergang"><label for="other">Fpeter</label><br /><input type="radio" name="person_id" class="knap"  value="1"></div>
-            </radio>
-            <br><br>
-            <input class="sendbutton" type='submit' />
-        </form>
-        <br><br>
-        <div id="kranie">N</div>
+        <h1>Kontrol panel</h1>
+        
+        <button class="panelToggle" onClick="togglePanel(true)">Vis panel</button>
+        <button class="panelToggle" onClick="togglePanel(false)">Skjul panel</button>
     </div>
 </div>
 
