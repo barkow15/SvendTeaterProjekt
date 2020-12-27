@@ -15,6 +15,8 @@
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
         crossorigin="anonymous"
     ></script>
+
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <style>
@@ -103,11 +105,19 @@
             radioValue: radioValue,
             spoergsmaalIndex: spoergsmaalIndex
         }
+
+        const panelElem = document.querySelector('.boks');
         
         axios.post('/stem', finalValueToSubmit).then((response) => {
-            console.log(response);
-        }, (error) => {
-            console.log(error);
+            panelElem.style.display = "none";
+        }).catch((error) => {
+            panelElem.style.display = "block";
+            
+            swal({
+                title: "Noget gik galt",
+                text: "Prøv igen",
+                icon: "error",
+            });
         });
     });
     
@@ -180,6 +190,7 @@
             panelElem.style.display = "none";
         }
     });
+    
 </script>
 </body>
 </html>

@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
    res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/controlpanel', (req, res) => {
+app.get('/stemmeoversigt', (req, res) => {
    res.sendFile(__dirname + '/panelControls.html');
 });
 
@@ -99,9 +99,36 @@ app.post('/stem', (req, res) => {
    , (error) => {
       if (error) {
          // The write failed...
+         res.status(500).send("Fejl noget gik galt prøv igen");
       } else {
          // Data saved successfully!
+         res.status(200).send(true);
       }
+   });
+});
+
+app.get('/nulstil', (req, res) => {
+
+   let spoergsmalIndexes = [];
+
+   db.ref('sporgsmaal/').once('value', snapshot => {
+      
+      const updates = {};
+      snapshot.forEach((child) => {
+         
+         const childVals = child.val().valgmuligheder;
+
+         for (const [key, value] of Object.entries(childVals)) {
+            updates[`${child.key}/valgmuligheder/${key}`] = 0;
+         }
+      });
+      
+      return db.ref('sporgsmaal/').update(updates);
+   }).then(() => {
+      res.status(200).end();
+   }).catch((err) => {
+      console.log(err);
+      res.status(500).send(err);
    });
 });
 
