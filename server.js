@@ -21,10 +21,21 @@ const ref = db.ref("/");
  * Firebase Data Object
  */
 
+let spoergsaalData = null;
 
 ref.once("value", function(snapshot) {
    const data = snapshot.val();   //Data is in JSON format.
    console.log(data);
+   
+   spoergsaalData = data;
+});
+
+ref.on("child_changed", function(snapshot) {
+   const data = snapshot.val();   //Data is in JSON format.
+   console.log(data);
+   spoergsaalData = data;
+}, function (errorObject) {
+   console.log("The read failed: " + errorObject.code);
 });
 
 
@@ -38,6 +49,24 @@ app.get('/controlpanel', (req, res) => {
    res.sendFile(__dirname + '/panelControls.html');
 });
 
+app.get('/spoergsmaal/:number', (req, res) => {
+   const {number} = req.params;
+
+   io.sockets.emit('spoergsmaal', number);
+   
+   res.send(number);
+});
+
+app.get('/hentspoergsmaal', (req, res) => {
+   ref.once("value", function(snapshot) {
+      const data = snapshot.val();   //Data is in JSON format.
+      
+      console.log(data);
+      
+      res.status(200).send(data);
+   });
+});
+
 app.post('/panel', (req, res) => {
    if(req.body.showPanel === true){
       io.sockets.emit('showpanel', true);
@@ -49,6 +78,38 @@ app.post('/panel', (req, res) => {
       res.status(400).send("Not the right format buddy. Try again.");
    }
 });
+
+app.post('/stem', (req, res) => {
+   const { radioValue, spoergsmaalIndex } = req.body;
+   let currentVoteCount = null;
+   const ref = `sporgsmaal/${spoergsmaalIndex}/valgmuligheder/${radioValue}`;
+   
+   const voteRef = db.ref(ref);
+   voteRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      currentVoteCount = data;
+   });
+   
+   let newVoteCount = currentVoteCount + 1;
+   
+   console.log(newVoteCount);
+
+   db.ref(ref).set(
+      newVoteCount
+   , (error) => {
+      if (error) {
+         // The write failed...
+      } else {
+         // Data saved successfully!
+      }
+   });
+});
+
+app.get('/skjulpanel', (req, res) => {
+      io.sockets.emit('hidepanel', true);
+      res.status(200).send("Success. Hiding panel.");
+});
+
 //
 // app.post('/post', (req, res) => {
 //    console.log(req.params);
